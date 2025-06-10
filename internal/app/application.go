@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"gorm.io/gorm"
 
@@ -27,32 +28,43 @@ func (a *Application) InitializeApplication() (*Application, any) {
 func InitializeApplication() (*Application, error) {
 	initializers.InitializeEnvs()
 
+	// Initialize logging first to capture any errors
 	if err := initializers.InitializeLogs(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize logs: %w", err)
 	}
 
 	app, err := BuildApplication()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build application: %w", err)
+	}
+
+	// Validate required configuration
+	if app.Container.Config == nil {
+		return nil, fmt.Errorf("application configuration is missing")
+	}
+	if app.Container.Config.Telegram == nil {
+		return nil, fmt.Errorf("telegram configuration is missing - check your .env file")
+	}
+	if app.Container.Config.Telegram.Token == "" {
+		return nil, fmt.Errorf("telegram bot token is required - set TELEGRAM_TOKEN in .env file")
 	}
 
 	err = initializers.InitializeMigrations(app.db)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize migrations: %w", err)
 	}
 
 	// Initialize Telegram bot service
-	if app.Container.Config.Telegram != nil && app.Container.Config.Telegram.Token != "" {
-		telegramBot, err := services.NewTelegramBotService(
-			app.Container.Config.Telegram,
-			app.Container.TelegramUserRepository,
-		)
-		if err != nil {
-			return nil, err
-		}
-		app.telegramBot = telegramBot
+	telegramBot, err := services.NewTelegramBotService(
+		app.Container.Config.Telegram,
+		app.Container.TelegramUserRepository,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize telegram bot: %w", err)
 	}
+	app.telegramBot = telegramBot
 
+	log.Info().Msg("Application initialized successfully")
 	return app, nil
 }
 

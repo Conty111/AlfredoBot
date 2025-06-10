@@ -1,11 +1,11 @@
 package interfaces
 
 import (
-	"github.com/Conty111/AlfredoBot/internal/models"
 	"github.com/google/uuid"
+
+	"github.com/Conty111/AlfredoBot/internal/models"
 )
 
-//go:generate mockery
 type TelegramUserProvider interface {
 	GetByID(id uuid.UUID) (*models.TelegramUser, error)
 	GetByTelegramID(telegramID int64) (*models.TelegramUser, error)
@@ -14,7 +14,6 @@ type TelegramUserProvider interface {
 	GetUsersByState(state string) ([]*models.TelegramUser, error)
 }
 
-//go:generate mockery
 type TelegramUserManager interface {
 	GetByID(id uuid.UUID) (*models.TelegramUser, error)
 	GetByTelegramID(telegramID int64) (*models.TelegramUser, error)

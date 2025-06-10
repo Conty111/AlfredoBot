@@ -51,8 +51,8 @@ func getDbDSN(dbConfig *DatabaseConfig) string {
 func getAppConfig() *App {
 	appCfg := &App{}
 	
-	appCfg.Name = envy.Get("APP_NAME", "TelegramBot")
-	appCfg.Version = envy.Get("APP_VERSION", "1.0.0")
+	appCfg.Name = envy.Get("APP_NAME", "AlfredoBot")
+	appCfg.Version = envy.Get("APP_VERSION", "0.0.1")
 	appCfg.Environment = envy.Get("APP_ENV", "development")
 
 	return appCfg
@@ -63,7 +63,6 @@ func getTelegramConfig() *TelegramConfig {
 	telegramCfg := &TelegramConfig{}
 	
 	telegramCfg.Token = envy.Get("TELEGRAM_TOKEN", "")
-	telegramCfg.Debug = envy.Get("TELEGRAM_DEBUG", "false") == "true"
 	
 	timeout, err := strconv.Atoi(envy.Get("TELEGRAM_TIMEOUT", "60"))
 	if err != nil {

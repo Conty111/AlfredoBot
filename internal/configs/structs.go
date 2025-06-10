@@ -19,7 +19,6 @@ type DatabaseConfig struct {
 // TelegramConfig holds configuration for the Telegram bot
 type TelegramConfig struct {
 	Token     string
-	Debug     bool
 	Timeout   int
 	WebhookURL string
 	UseWebhook bool

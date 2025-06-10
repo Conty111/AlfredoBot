@@ -1,12 +1,13 @@
 package initializers
 
 import (
+	"log"
 	"os"
 	"strconv"
 
 	"github.com/gobuffalo/envy"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	zlog "github.com/rs/zerolog/log"
 )
 
 const (
@@ -18,23 +19,45 @@ const (
 	DefaultLogLevel = 0
 )
 
-// InitializeLogs setups zerolog logger
+// InitializeLogs setups zerolog logger with consistent JSON output
 func InitializeLogs() error {
 	logLevel, err := strconv.Atoi(envy.Get(LogLevelEnv, "0"))
 	if err != nil {
 		logLevel = DefaultLogLevel
 	}
 
+	// Configure logger with UTC timestamps and caller info
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.Level(logLevel))
-
-	// json or human readable output
-	log.Logger.Level(zerolog.Level(logLevel))
-	if envy.Get(EnableJSONLogsEnv, "false") == "false" {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	
+	// Always use JSON format in production
+	if envy.Get("APP_ENV", "development") == "production" ||
+	   envy.Get(EnableJSONLogsEnv, "true") == "true" {
+		zlog.Logger = zerolog.New(os.Stderr).
+			With().
+			Timestamp().
+			Caller().
+			Logger()
+	} else {
+		// Development - use colored console output
+		output := zerolog.ConsoleWriter{
+			Out: os.Stderr,
+			TimeFormat: "15:04:05",
+		}
+		zlog.Logger = zlog.Output(output).With().Caller().Logger()
 	}
 
-	log.Logger = log.With().Caller().Logger()
+	zerolog.DefaultContextLogger = &zlog.Logger
+	log.SetOutput(&zerologWriter{logger: zlog.Logger})
 
 	return nil
+}
+
+type zerologWriter struct {
+	logger zerolog.Logger
+}
+
+func (w *zerologWriter) Write(p []byte) (n int, err error) {
+	w.logger.Info().Msg(string(p))
+	return len(p), nil
 }

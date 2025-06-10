@@ -5,7 +5,7 @@ go 1.23.7
 toolchain go1.23.10
 
 require (
-	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
+	github.com/go-telegram/bot v1.15.0
 	github.com/gobuffalo/envy v1.10.2
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.6.0
