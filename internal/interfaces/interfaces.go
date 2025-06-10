@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"github.com/Conty111/TelegramBotTemplate/internal/models"
+	"github.com/Conty111/AlfredoBot/internal/models"
 	"github.com/google/uuid"
 )
 

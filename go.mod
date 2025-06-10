@@ -1,4 +1,4 @@
-module github.com/Conty111/Alfredo
+module github.com/Conty111/AlfredoBot
 
 go 1.23.7
 

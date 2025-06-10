@@ -6,11 +6,11 @@ package app
 import (
 	"github.com/google/wire"
 
-	"github.com/Conty111/TelegramBotTemplate/internal/app/dependencies"
-	"github.com/Conty111/TelegramBotTemplate/internal/app/initializers"
-	"github.com/Conty111/TelegramBotTemplate/internal/configs"
-	"github.com/Conty111/TelegramBotTemplate/internal/interfaces"
-	"github.com/Conty111/TelegramBotTemplate/internal/repositories"
+	"github.com/Conty111/AlfredoBot/internal/app/dependencies"
+	"github.com/Conty111/AlfredoBot/internal/app/initializers"
+	"github.com/Conty111/AlfredoBot/internal/configs"
+	"github.com/Conty111/AlfredoBot/internal/interfaces"
+	"github.com/Conty111/AlfredoBot/internal/repositories"
 )
 
 func BuildApplication() (*Application, error) {

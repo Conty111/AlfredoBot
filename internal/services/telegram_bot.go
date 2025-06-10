@@ -9,9 +9,9 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/rs/zerolog/log"
 
-	"github.com/Conty111/TelegramBotTemplate/internal/configs"
-	"github.com/Conty111/TelegramBotTemplate/internal/interfaces"
-	"github.com/Conty111/TelegramBotTemplate/internal/models"
+	"github.com/Conty111/AlfredoBot/internal/configs"
+	"github.com/Conty111/AlfredoBot/internal/interfaces"
+	"github.com/Conty111/AlfredoBot/internal/models"
 )
 
 // TelegramBotService handles Telegram bot operations

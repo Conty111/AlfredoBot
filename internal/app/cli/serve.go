@@ -2,7 +2,7 @@ package cli
 
 import (
 	"context"
-	"github.com/Conty111/TelegramBotTemplate/internal/app"
+	"github.com/Conty111/AlfredoBot/internal/app"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"os"

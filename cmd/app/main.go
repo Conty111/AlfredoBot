@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/Conty111/TelegramBotTemplate/internal/app/cli"
+	"github.com/Conty111/AlfredoBot/internal/app/cli"
 )
 
 func main() {

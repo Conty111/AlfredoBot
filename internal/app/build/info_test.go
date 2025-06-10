@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/dimagic/Repositories/Alfredo/internal/app/build"
+	"github.com/Conty111/AlfredoBot/internal/app/build"
 )
 
 var _ = Describe("Info", func() {

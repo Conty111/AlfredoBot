@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/Conty111/TelegramBotTemplate/internal/app"
+	"github.com/Conty111/AlfredoBot/internal/app"
 )
 
 var _ = Describe("Application", func() {

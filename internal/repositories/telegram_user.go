@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/dimagic/Repositories/Alfredo/internal/errs"
-	"github.com/dimagic/Repositories/Alfredo/internal/models"
+	"github.com/Conty111/AlfredoBot/internal/errs"
+	"github.com/Conty111/AlfredoBot/internal/models"
 )
 
 // TelegramUserRepository handles database operations for Telegram users

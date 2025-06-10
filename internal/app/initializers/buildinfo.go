@@ -1,7 +1,7 @@
 package initializers
 
 import (
-	"github.com/Conty111/TelegramBotTemplate/internal/app/build"
+	"github.com/Conty111/AlfredoBot/internal/app/build"
 )
 
 // InitializeBuildInfo creates new build.Info

@@ -6,9 +6,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/Conty111/TelegramBotTemplate/internal/configs"
-	"github.com/Conty111/TelegramBotTemplate/internal/models"
-	"github.com/Conty111/TelegramBotTemplate/pkg/logger"
+	"github.com/Conty111/AlfredoBot/internal/configs"
+	"github.com/Conty111/AlfredoBot/internal/models"
+	"github.com/Conty111/AlfredoBot/pkg/logger"
 )
 
 func InitializeDatabase(cfg *configs.Configuration) *gorm.DB {

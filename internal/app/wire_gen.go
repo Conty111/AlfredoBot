@@ -7,10 +7,10 @@
 package app
 
 import (
-	"github.com/Conty111/TelegramBotTemplate/internal/app/dependencies"
-	"github.com/Conty111/TelegramBotTemplate/internal/app/initializers"
-	"github.com/Conty111/TelegramBotTemplate/internal/configs"
-	"github.com/Conty111/TelegramBotTemplate/internal/repositories"
+	"github.com/Conty111/AlfredoBot/internal/app/dependencies"
+	"github.com/Conty111/AlfredoBot/internal/app/initializers"
+	"github.com/Conty111/AlfredoBot/internal/configs"
+	"github.com/Conty111/AlfredoBot/internal/repositories"
 )
 
 // Injectors from wire.go:

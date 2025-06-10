@@ -7,9 +7,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/Conty111/TelegramBotTemplate/internal/app/dependencies"
-	"github.com/Conty111/TelegramBotTemplate/internal/app/initializers"
-	"github.com/Conty111/TelegramBotTemplate/internal/services"
+	"github.com/Conty111/AlfredoBot/internal/app/dependencies"
+	"github.com/Conty111/AlfredoBot/internal/app/initializers"
+	"github.com/Conty111/AlfredoBot/internal/services"
 )
 
 // Application is a main struct for the application that contains general information

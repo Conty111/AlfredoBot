@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "github.com/Conty111/TelegramBotTemplate/internal/app/initializers"
+	. "github.com/Conty111/AlfredoBot/internal/app/initializers"
 )
 
 var _ = Describe("Envs", func() {
