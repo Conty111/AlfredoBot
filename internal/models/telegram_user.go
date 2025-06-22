@@ -15,8 +15,8 @@ type TelegramUser struct {
 	LastName     string `gorm:"column:last_name"`
 	LanguageCode string `gorm:"column:language_code"`
 	IsBot        bool   `gorm:"column:is_bot"`
-	// Add any additional fields you might need for your bot
-	State        string `gorm:"column:state"` // For managing conversation state
+	Photos	   []Photo `gorm:"foreignKey:UserID"`
+	State string `gorm:"column:state"`
 }
 
 func (u *TelegramUser) BeforeCreate(_ *gorm.DB) (err error) {
@@ -28,5 +28,11 @@ func (u *TelegramUser) BeforeCreate(_ *gorm.DB) (err error) {
 type TelegramUserFilter struct {
 	TelegramID   int64
 	Username     string
-	State        string
+	State string
 }
+
+const (
+	TelegramUserStateUploading = "uploading"
+	TelegramUserStateSearching = "searching"
+	TelegramUserStateDefault	= "default"
+)

@@ -10,43 +10,40 @@ import (
 
 	"github.com/Conty111/AlfredoBot/internal/app/dependencies"
 	"github.com/Conty111/AlfredoBot/internal/app/initializers"
-	"github.com/Conty111/AlfredoBot/internal/services"
+	"github.com/Conty111/AlfredoBot/internal/configs"
+	"github.com/Conty111/AlfredoBot/internal/interfaces"
+	"github.com/Conty111/AlfredoBot/internal/repositories"
+	"github.com/Conty111/AlfredoBot/internal/services/s3"
+	"github.com/Conty111/AlfredoBot/internal/services/telegram"
 )
 
 // Application is a main struct for the application that contains general information
 type Application struct {
 	db          *gorm.DB
 	Container   *dependencies.Container
-	telegramBot *services.TelegramBotService
-}
-
-func (a *Application) InitializeApplication() (*Application, any) {
-	panic("unimplemented")
+	telegramBot *telegram.TelegramBotService
 }
 
 // InitializeApplication initializes new application
-func InitializeApplication() (*Application, error) {
+func InitializeApplication(cfg *configs.Configuration) (*Application, error) {
 	initializers.InitializeEnvs()
 
 	// Initialize logging first to capture any errors
-	if err := initializers.InitializeLogs(); err != nil {
+	if err := initializers.InitializeLogs(*cfg.App); err != nil {
 		return nil, fmt.Errorf("failed to initialize logs: %w", err)
 	}
 
-	app, err := BuildApplication()
+	app, err := BuildApplication(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build application: %w", err)
 	}
 
 	// Validate required configuration
-	if app.Container.Config == nil {
-		return nil, fmt.Errorf("application configuration is missing")
+	if cfg.Telegram == nil {
+		return nil, fmt.Errorf("telegram configuration is missing - check your config")
 	}
-	if app.Container.Config.Telegram == nil {
-		return nil, fmt.Errorf("telegram configuration is missing - check your .env file")
-	}
-	if app.Container.Config.Telegram.Token == "" {
-		return nil, fmt.Errorf("telegram bot token is required - set TELEGRAM_TOKEN in .env file")
+	if cfg.Telegram.Token == "" {
+		return nil, fmt.Errorf("telegram bot token is required")
 	}
 
 	err = initializers.InitializeMigrations(app.db)
@@ -54,10 +51,41 @@ func InitializeApplication() (*Application, error) {
 		return nil, fmt.Errorf("failed to initialize migrations: %w", err)
 	}
 
+	// Create repositories if they don't exist
+	var photoRepository interfaces.PhotoManager
+	// Create S3 client if it doesn't exist
+	var s3Client interfaces.S3Client
+	if app.Container.S3Client == nil {
+		s3Client, err = createS3Client(cfg.S3)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create S3 client: %w", err)
+		}
+	} else {
+		s3Client = app.Container.S3Client
+	}
+
+	if app.Container.PhotoRepository == nil {
+		photoRepository = repositories.NewPhotoRepository(app.db, s3Client)
+	} else {
+		photoRepository = app.Container.PhotoRepository
+	}
+	
+	var articleRepository interfaces.ArticleNumberManager
+	if app.Container.ArticleNumberRepository == nil {
+		articleRepository = repositories.NewArticleNumberRepository(app.db)
+	} else {
+		articleRepository = app.Container.ArticleNumberRepository
+	}
+	
+	
 	// Initialize Telegram bot service
-	telegramBot, err := services.NewTelegramBotService(
-		app.Container.Config.Telegram,
+	telegramBot, err := telegram.NewTelegramBotService(
+		cfg.Telegram,
+		cfg.S3,
 		app.Container.TelegramUserRepository,
+		photoRepository,
+		articleRepository,
+		s3Client,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize telegram bot: %w", err)
@@ -96,4 +124,19 @@ func (a *Application) Stop() (err error) {
 	}
 
 	return nil
+}
+
+// createS3Client creates a new S3 client
+func createS3Client(cfg *configs.S3Config) (interfaces.S3Client, error) {
+	if cfg == nil {
+		return nil, fmt.Errorf("S3 config is nil")
+	}
+	
+	// Import the s3 package
+	s3Client, err := s3.NewClient(cfg)
+	if err != nil {
+		return nil, err
+	}
+	
+	return s3.NewS3Client(s3Client), nil
 }

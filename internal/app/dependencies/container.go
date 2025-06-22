@@ -11,4 +11,7 @@ type Container struct {
 	BuildInfo              *build.Info
 	Config                 *configs.Configuration
 	TelegramUserRepository interfaces.TelegramUserManager
+	PhotoRepository        interfaces.PhotoManager
+	ArticleNumberRepository interfaces.ArticleNumberManager
+	S3Client               interfaces.S3Client
 }

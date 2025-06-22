@@ -31,6 +31,7 @@ RUN apk add musl-dev && apk add libc6-compat
 
 RUN #mkdir -p ./api
 RUN mkdir -p ./db/migrations
+RUN mkdir -p ./certs
 
 #COPY --from=builder /source/docs/api ./docs/api
 COPY --from=builder /source/build/app .

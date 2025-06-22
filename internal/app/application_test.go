@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/Conty111/AlfredoBot/internal/app"
+	"github.com/Conty111/AlfredoBot/internal/configs"
 )
 
 var _ = Describe("Application", func() {
@@ -25,7 +26,7 @@ var _ = Describe("Application", func() {
 		)
 
 		BeforeEach(func() {
-			app, _ = app.InitializeApplication()
+			app, _ = app.InitializeApplication(configs.Configuration{})
 		})
 
 		Describe("Start(), Stop()", func() {

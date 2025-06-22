@@ -1,4 +1,4 @@
-PROJECT_PKG = github.com/Conty111/CarsCatalog
+PROJECT_PKG = github.com/Conty111/AlfredoBot
 BUILD_DIR = build
 
 VERSION ?=$(shell git describe --tags --exact-match 2>/dev/null || git symbolic-ref -q --short HEAD)
@@ -43,3 +43,8 @@ install-tools:
 	go install github.com/google/wire/cmd/wire@latest
 	go install github.com/swaggo/swag/cmd/swag@latest
 	go get -u github.com/onsi/ginkgo/ginkgo
+
+gen-certs:
+	mkdir -p certs
+	chmod +x scripts/generate-minio-certs.sh
+	./scripts/generate-minio-certs.sh

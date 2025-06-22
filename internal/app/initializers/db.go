@@ -22,9 +22,13 @@ func InitializeDatabase(cfg *configs.Configuration) *gorm.DB {
 }
 
 func InitializeMigrations(db *gorm.DB) error {
-	var telegramUsers models.TelegramUser
 	
-	err := db.AutoMigrate(&telegramUsers)
+	err := db.AutoMigrate(
+		&models.TelegramUser{},
+		&models.Photo{},
+		&models.ArticleNumber{},
+		&models.ArticleNumberPhoto{},
+	)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to run migrations")
 		return err

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres-db:
     image: postgres
@@ -15,18 +13,50 @@ services:
       retries: 5
     ports:
       - "5432:5432"
+      
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - minio-data:/data
+      - ./certs:/root/.minio/certs
+    command: server /data --console-address ":9001" --certs-dir /root/.minio/certs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "--insecure", "https://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console
 
+  minio-init:
+    image: minio/mc
+    env_file:
+      - .env
+    volumes:
+      - ./scripts/init-minio.sh:/init-minio.sh
+      - ./certs:/certs
+    entrypoint: ["/bin/sh", "/init-minio.sh"]
+    depends_on:
+      minio:
+        condition: service_healthy
   alfredo-bot:
     build:
       context: .
-      target: production
     image: alfredo-bot:latest
     restart: unless-stopped
     env_file:
       - .env
+    volumes:
+      - ./certs:/app/certs:ro
     depends_on:
       postgres-db:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     ports:
       - "8080:8080"
     healthcheck:
@@ -38,3 +68,4 @@ services:
 
 volumes:
   alfredo-db-data:
+  minio-data:

@@ -10,24 +10,53 @@ import (
 	"github.com/Conty111/AlfredoBot/internal/app/dependencies"
 	"github.com/Conty111/AlfredoBot/internal/app/initializers"
 	"github.com/Conty111/AlfredoBot/internal/configs"
+	"github.com/Conty111/AlfredoBot/internal/interfaces"
 	"github.com/Conty111/AlfredoBot/internal/repositories"
+	"github.com/Conty111/AlfredoBot/internal/services/s3"
 )
 
 // Injectors from wire.go:
 
-func BuildApplication() (*Application, error) {
-	configuration := configs.GetConfig()
-	db := initializers.InitializeDatabase(configuration)
+func BuildApplication(cfg *configs.Configuration) (*Application, error) {
+	db := initializers.InitializeDatabase(cfg)
 	info := initializers.InitializeBuildInfo()
 	telegramUserRepository := repositories.NewTelegramUserRepository(db)
+	s3Client, err := provideS3Client(cfg)
+	if err != nil {
+		return nil, err
+	}
+	photoRepository := &repositories.PhotoRepository{
+		DB:       db,
+		S3Client: s3Client,
+	}
+	articleNumberRepository := repositories.NewArticleNumberRepository(db)
 	container := &dependencies.Container{
-		BuildInfo:              info,
-		Config:                 configuration,
-		TelegramUserRepository: telegramUserRepository,
+		BuildInfo:               info,
+		Config:                  cfg,
+		TelegramUserRepository:  telegramUserRepository,
+		PhotoRepository:         photoRepository,
+		ArticleNumberRepository: articleNumberRepository,
+		S3Client:                s3Client,
 	}
 	application := &Application{
 		db:        db,
 		Container: container,
 	}
 	return application, nil
+}
+
+// wire.go:
+
+// provideS3Client creates a new S3 client
+func provideS3Client(cfg *configs.Configuration) (interfaces.S3Client, error) {
+	if cfg.S3 == nil {
+		return nil, nil
+	}
+
+	s3Client, err := s3.NewClient(cfg.S3)
+	if err != nil {
+		return nil, err
+	}
+
+	return s3.NewS3Client(s3Client), nil
 }

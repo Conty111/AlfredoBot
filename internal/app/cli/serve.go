@@ -2,17 +2,22 @@ package cli
 
 import (
 	"context"
-	"github.com/Conty111/AlfredoBot/internal/app"
-	"github.com/rs/zerolog/log"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
+
+	"github.com/Conty111/AlfredoBot/internal/app"
+	"github.com/Conty111/AlfredoBot/internal/configs"
 )
 
 // NewServeCmd starts new application instance
 func NewServeCmd() *cobra.Command {
-	return &cobra.Command{
+	var configPath string
+
+	cmd := &cobra.Command{
 		Use:     "serve",
 		Aliases: []string{"s"},
 		Short:   "Start server",
@@ -25,8 +30,11 @@ func NewServeCmd() *cobra.Command {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			application, err := app.InitializeApplication()
-
+			cfg, err := configs.LoadConfig(configPath)
+			if err != nil {
+				log.Fatal().Err(err).Msg("failed to load configuration")
+			}
+			application, err := app.InitializeApplication(cfg)
 			if err != nil {
 				log.Fatal().Err(err).Msg("can not initialize application")
 			}
@@ -38,8 +46,11 @@ func NewServeCmd() *cobra.Command {
 			<-sigchan
 
 			log.Error().Err(application.Stop()).Msg("stop application")
-
 			log.Info().Msg("Finished")
 		},
 	}
+
+	cmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to config file (default searches for config.yaml|json)")
+
+	return cmd
 }

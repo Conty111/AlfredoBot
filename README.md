@@ -11,6 +11,7 @@ A reusable template for creating Telegram bots in Go.
 * User state management
 * Support for both long polling and webhook modes
 * Docker support for easy deployment
+* S3-compatible storage with MinIO
 
 ## How to run
 
@@ -24,6 +25,10 @@ A reusable template for creating Telegram bots in Go.
 ```
 cp .docker.env.example .docker.env
 # Edit .docker.env to add your Telegram bot token
+# Generate self-signed certificates for MinIO
+make gen-certs
+
+# Start the services
 docker-compose up -d
 ```
 
@@ -152,3 +157,27 @@ make deps
 * [wire](https://github.com/google/wire) - Dependency injection
 * [ginkgo](https://github.com/onsi/ginkgo) - Testing framework
 * [docker](https://www.docker.com/) - Containerization
+* [minio](https://min.io/) - S3-compatible object storage
+
+## S3 Storage with MinIO
+
+This project uses MinIO as an S3-compatible object storage service for storing files. MinIO is configured to use TLS for secure communication.
+
+### Setting up MinIO with TLS
+
+1. Generate self-signed certificates:
+   ```
+   make gen-certs
+   ```
+
+2. The certificates will be placed in the `./certs` directory, which is mounted to the MinIO container.
+
+3. MinIO is configured to use these certificates automatically when started with Docker Compose.
+
+4. The S3 client in the application is configured to use TLS when connecting to MinIO.
+
+### Accessing MinIO Console
+
+The MinIO console is available at https://localhost:9001 (username and password are defined in the .env file).
+
+Note: Since we're using self-signed certificates, you'll need to accept the security warning in your browser.

@@ -1,9 +1,11 @@
 package models
 
 import (
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
+
+	"github.com/google/uuid"
 )
 
 type BaseModel struct {

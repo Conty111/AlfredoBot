@@ -1,79 +1,56 @@
 package configs
 
-import (
-	"fmt"
-	"strconv"
-
-	"github.com/gobuffalo/envy"
-	"github.com/rs/zerolog/log"
-)
-
-func GetConfig() *Configuration {
-	return getFromEnv()
+// Configuration contains all application configurations
+type Configuration struct {
+	App      *App            `mapstructure:"app"`
+	DB       *DatabaseConfig `mapstructure:"db"`
+	Telegram *TelegramConfig `mapstructure:"telegram"`
+	S3       *S3Config       `mapstructure:"s3"`
 }
 
-func getFromEnv() *Configuration {
-	cfg := &Configuration{}
-
-	cfg.App = getAppConfig()
-	cfg.DB = getDBConfig()
-	cfg.Telegram = getTelegramConfig()
-	return cfg
+// App contains application configuration
+type App struct {
+	Name        string `mapstructure:"name"`
+	Version     string `mapstructure:"version"`
+	Environment string `mapstructure:"environment"`
+	LogLevel    string `mapstructure:"log_level"`
+	LogFile     string `mapstructure:"log_file"`
+	JSONLogs    bool   `mapstructure:"enable_json_logs"`
 }
 
-func getDBConfig() *DatabaseConfig {
-	dbCfg := &DatabaseConfig{}
-
-	dbCfg.Host = envy.Get("DB_HOST", "localhost")
-	dbCfg.User = envy.Get("DB_USER", "postgres")
-	dbCfg.Password = envy.Get("DB_PASSWORD", "postgres")
-	dbCfg.DBName = envy.Get("DB_NAME", "cars")
-	dbCfg.SSLMode = envy.Get("DB_SSLMODE", "disable")
-	port, err := strconv.Atoi(envy.Get("DB_PORT", "5432"))
-	if err != nil {
-		log.Panic().Err(err).Msg("cannot convert DB_PORT")
-	}
-	dbCfg.Port = port
-
-	dbCfg.DSN = getDbDSN(dbCfg)
-
-	return dbCfg
+// DatabaseConfig contains database connection configuration
+type DatabaseConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	User     string `mapstructure:"user"`
+	Password string `mapstructure:"password"`
+	DBName   string `mapstructure:"name"`
+	SSLMode  string `mapstructure:"sslmode"`
+	DSN      string `mapstructure:"-"`
 }
 
-func getDbDSN(dbConfig *DatabaseConfig) string {
-	return fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
-		dbConfig.Host, dbConfig.User, dbConfig.Password,
-		dbConfig.DBName, dbConfig.Port, dbConfig.SSLMode,
-	)
+// TelegramConfig contains Telegram bot configuration
+type TelegramConfig struct {
+	Token      string `mapstructure:"token"`
+	TokenFile  string `mapstructure:"token_file"`
+	Timeout    int    `mapstructure:"timeout"`
+	WebhookURL string `mapstructure:"webhook_url"`
+	UseWebhook bool   `mapstructure:"use_webhook"`
 }
 
-func getAppConfig() *App {
-	appCfg := &App{}
-	
-	appCfg.Name = envy.Get("APP_NAME", "AlfredoBot")
-	appCfg.Version = envy.Get("APP_VERSION", "0.0.1")
-	appCfg.Environment = envy.Get("APP_ENV", "development")
-
-	return appCfg
+// S3Config contains S3 storage configuration
+type S3Config struct {
+	Endpoint          string `mapstructure:"endpoint"`
+	Region            string `mapstructure:"region"`
+	AccessKeyID       string `mapstructure:"access_key_id"`
+	AccessKeyIDFile   string `mapstructure:"access_key_id_file"`
+	SecretAccessKey   string `mapstructure:"secret_access_key"`
+	SecretAccessKeyFile string `mapstructure:"secret_access_key_file"`
+	Bucket            string `mapstructure:"bucket"`
+	UseSSL            bool   `mapstructure:"use_ssl"`
 }
 
-// getTelegramConfig loads Telegram bot configuration from environment variables
-func getTelegramConfig() *TelegramConfig {
-	telegramCfg := &TelegramConfig{}
-	
-	telegramCfg.Token = envy.Get("TELEGRAM_TOKEN", "")
-	
-	timeout, err := strconv.Atoi(envy.Get("TELEGRAM_TIMEOUT", "60"))
-	if err != nil {
-		log.Warn().Err(err).Msg("cannot convert TELEGRAM_TIMEOUT, using default value")
-		timeout = 60
-	}
-	telegramCfg.Timeout = timeout
-	
-	telegramCfg.WebhookURL = envy.Get("TELEGRAM_WEBHOOK_URL", "")
-	telegramCfg.UseWebhook = envy.Get("TELEGRAM_USE_WEBHOOK", "false") == "true"
-	
-	return telegramCfg
+// GetConfig loads configuration using default path
+func GetConfig() (*Configuration, error) {
+	return LoadConfig("")
 }
-

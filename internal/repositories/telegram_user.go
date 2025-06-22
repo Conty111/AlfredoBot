@@ -36,10 +36,10 @@ func (r *TelegramUserRepository) GetByID(id uuid.UUID) (*models.TelegramUser, er
 func (r *TelegramUserRepository) GetByTelegramID(telegramID int64) (*models.TelegramUser, error) {
 	user := &models.TelegramUser{}
 	tx := r.db.Where("telegram_id = ?", telegramID).First(user)
-	if tx.Error != nil {
+	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
 		return nil, tx.Error
 	}
-	if tx.RowsAffected == 0 {
+	if tx.RowsAffected == 0 || tx.Error == gorm.ErrRecordNotFound {
 		return nil, errs.UserNotFound
 	}
 	return user, nil

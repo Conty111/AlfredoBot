@@ -5,23 +5,20 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/gobuffalo/envy"
 	"github.com/rs/zerolog"
 	zlog "github.com/rs/zerolog/log"
+
+	"github.com/Conty111/AlfredoBot/internal/configs"
 )
 
 const (
-	// LogLevelEnv is an environment variable name for LOG_LEVEL
-	LogLevelEnv = "LOG_LEVEL"
-	// EnableJSONLogsEnv is an environment variable name for ENABLE_JSON_LOGS
-	EnableJSONLogsEnv = "ENABLE_JSON_LOGS"
 	// DefaultLogLevel is a default LOG_LEVEL value
 	DefaultLogLevel = 0
 )
 
 // InitializeLogs setups zerolog logger with consistent JSON output
-func InitializeLogs() error {
-	logLevel, err := strconv.Atoi(envy.Get(LogLevelEnv, "0"))
+func InitializeLogs(cfg configs.App) error {
+	logLevel, err := strconv.Atoi(cfg.LogLevel)
 	if err != nil {
 		logLevel = DefaultLogLevel
 	}
@@ -30,21 +27,27 @@ func InitializeLogs() error {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.Level(logLevel))
 	
-	// Always use JSON format in production
-	if envy.Get("APP_ENV", "development") == "production" ||
-	   envy.Get(EnableJSONLogsEnv, "true") == "true" {
-		zlog.Logger = zerolog.New(os.Stderr).
+	if cfg.Environment == "production" ||
+	   cfg.JSONLogs || cfg.LogFile != "" {
+		output := os.Stdout
+		if cfg.LogFile != "" {
+			file, err := os.OpenFile(cfg.LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			if err != nil {
+				return err
+			}
+			output = file
+		}
+		zlog.Logger = zerolog.New(output).
 			With().
 			Timestamp().
 			Caller().
 			Logger()
 	} else {
-		// Development - use colored console output
-		output := zerolog.ConsoleWriter{
-			Out: os.Stderr,
-			TimeFormat: "15:04:05",
-		}
-		zlog.Logger = zlog.Output(output).With().Caller().Logger()
+		zlog.Logger = zlog.
+		Output(zerolog.ConsoleWriter{Out: os.Stdout}).
+		With().
+		Caller().
+		Logger()
 	}
 
 	zerolog.DefaultContextLogger = &zlog.Logger
