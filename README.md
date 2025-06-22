@@ -2,6 +2,11 @@
 
 A reusable template for creating Telegram bots in Go.
 
+TODO:
+1. Create bucket when MinIO bootstraps
+2. Fix code clean
+3. Implement Cancel button while sending photo or article
+
 ## Features
 
 * Clean architecture with dependency injection
