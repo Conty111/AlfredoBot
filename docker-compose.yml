@@ -15,31 +15,35 @@ services:
       - "5432:5432"
       
   minio:
-    image: minio/minio
     restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      - minio-data:/data
-      - ./certs:/root/.minio/certs
-    command: server /data --console-address ":9001" --certs-dir /root/.minio/certs
-    healthcheck:
-      test: ["CMD", "curl", "-f", "--insecure", "https://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    image: minio/minio:latest
+    command: server /data --console-address ":9001" --certs-dir /certs
     ports:
-      - "9000:9000"  # API
-      - "9001:9001"  # Console
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - MINIO_ROOT_USER=alfredoadmin
+      - MINIO_ROOT_PASSWORD=alfredoadmin
+      - MINIO_SKIP_CLIENT=yes
+      - MINIO_SCHEME=https
+      - MINIO_CONSOLE_PORT_NUMBER=9001
+    volumes:
+      - ./minio:/data
+      - ./certs:/certs
+    healthcheck:
+      test: [ "CMD", "curl", "-k", "https://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   minio-init:
     image: minio/mc
     env_file:
       - .env
     volumes:
-      - ./scripts/init-minio.sh:/init-minio.sh
+      - ./scripts/create-bucket.sh:/create-bucket.sh
       - ./certs:/certs
-    entrypoint: ["/bin/sh", "/init-minio.sh"]
+    entrypoint: ["/bin/sh", "/create-bucket.sh"]
     depends_on:
       minio:
         condition: service_healthy
