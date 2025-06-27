@@ -72,10 +72,8 @@ docker-compose down
 
 ## Tools and packages
 
-* [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) - Telegram Bot API wrapper
 * [gorm](https://gorm.io/) - ORM library
 * [cobra](https://github.com/spf13/cobra) - CLI framework
-* [envy](https://github.com/gobuffalo/envy) - Environment variable management
 * [zerolog](https://github.com/rs/zerolog) - Zero allocation JSON logger
 * [wire](https://github.com/google/wire) - Dependency injection
 * [ginkgo](https://github.com/onsi/ginkgo) - Testing framework
