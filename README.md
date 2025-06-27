@@ -1,36 +1,19 @@
-# Telegram Bot Template
+# Alfredo Bot
 
-A reusable template for creating Telegram bots in Go.
-
-TODO:
-1. Create bucket when MinIO bootstraps
-2. Fix code clean
-3. Implement Cancel button while sending photo or article
-
-## Features
-
-* Clean architecture with dependency injection
-* Database integration with GORM
-* Telegram Bot API integration
-* Command handling system with middleware support
-* User state management
-* Support for both long polling and webhook modes
-* Docker support for easy deployment
-* S3-compatible storage with MinIO
+Mr Alfredo decided to create telegram bot which is very simple. This bot can add photos with articles and search them by article number. It's not even CRUD, but Alfredo tried well to code that.
 
 ## How to run
 
 ### Requirements
 
-* **_Local running_**: Go v1.22 and PostgreSQL server
+* **_Local running_**: Go v1.23, MinIO and PostgreSQL server
 * **_Running in Docker_**: Docker with Docker Compose
 
 ### Docker run
 
 ```
-cp .docker.env.example .docker.env
-# Edit .docker.env to add your Telegram bot token
-# Generate self-signed certificates for MinIO
+cp .env.exmaple .env
+# don't forget edit .evn file after copying 
 make gen-certs
 
 # Start the services
@@ -48,8 +31,8 @@ docker-compose down
     ```
     cp .env.example .env
     ```
-2. Make sure PostgreSQL is running. Update connection details in the **.env** file
-3. Add your Telegram bot token to the **.env** file
+2. Make sure PostgreSQL and MinIO are running. Update connection details in the **.env** and **config.yaml** file
+3. Add your Telegram bot token and other secrets to the **.env** file
 4. Install dependencies
     ```
     go mod tidy
@@ -58,77 +41,12 @@ docker-compose down
     ```
     make run
     ```
-    or build and run the binary
+    or build and run the binary (recommended)
     ```
     make build
     chmod +x ./build/app
-    ./build/app serve
+    ./build/app serve --config config.yaml
     ```
-
-## Creating a Telegram Bot
-
-1. Talk to [@BotFather](https://t.me/BotFather) on Telegram to create a new bot
-2. Get the token and add it to your .env file as `TELEGRAM_TOKEN`
-3. Customize the bot by implementing your own command handlers
-
-## Customizing the Bot
-
-### Adding New Commands
-
-To add a new command handler, modify the `NewTelegramBotService` function in `internal/services/telegram_bot.go`:
-
-```go
-// Register your custom handlers
-service.RegisterHandler("mycommand", service.handleMyCommand)
-```
-
-Then implement your handler function:
-
-```go
-func (s *TelegramBotService) handleMyCommand(update tgbotapi.Update) error {
-    // Your command logic here
-    msg := tgbotapi.NewMessage(update.Message.Chat.ID, "This is my custom command!")
-    _, err := s.bot.Send(msg)
-    return err
-}
-```
-
-### Adding Middleware
-
-You can add middleware to process updates before they reach handlers:
-
-```go
-// Add middleware
-service.RegisterMiddleware(func(update tgbotapi.Update, next CommandHandler) error {
-    // Do something before handling the command
-    log.Info().Str("command", update.Message.Command()).Msg("Processing command")
-    
-    // Call the next handler
-    return next(update)
-})
-```
-
-## Make commands
-
-```
-# runs application
-make run
-
-# install dev tools (wire, ginkgo)
-make install-tools
-
-# build application
-make build
-
-# run all unit tests
-make test-unit
-
-# run go generate
-make gen
-
-# generate dependencies with wire
-make deps
-```
 
 ## Project structure
 
@@ -141,14 +59,14 @@ make deps
 │   │   ├── cli - command line interface
 │   │   ├── dependencies - dependency container
 │   │   └── initializers - component initializers
-│   ├── configs - configuration structures
-│   ├── errs - custom errors
+│   ├── configs - configuration structures and loading
 │   ├── interfaces - component interfaces
 │   ├── models - entity models
 │   ├── repositories - storage layer
 │   └── services - business logic layer
 ├── pkg
 │   └── logger - logging utilities
+├── scripts - some scripts for deploy
 └── test - tests and mocks
 ```
 
