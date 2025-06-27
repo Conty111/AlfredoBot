@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/Conty111/AlfredoBot/internal/errs"
 	"github.com/Conty111/AlfredoBot/internal/models"
 )
 
@@ -27,7 +26,7 @@ func (r *TelegramUserRepository) GetByID(id uuid.UUID) (*models.TelegramUser, er
 		return nil, tx.Error
 	}
 	if tx.RowsAffected == 0 {
-		return nil, errs.UserNotFound
+		return nil, gorm.ErrRecordNotFound
 	}
 	return user, nil
 }
@@ -36,11 +35,11 @@ func (r *TelegramUserRepository) GetByID(id uuid.UUID) (*models.TelegramUser, er
 func (r *TelegramUserRepository) GetByTelegramID(telegramID int64) (*models.TelegramUser, error) {
 	user := &models.TelegramUser{}
 	tx := r.db.Where("telegram_id = ?", telegramID).First(user)
-	if tx.Error != nil && tx.Error != gorm.ErrRecordNotFound {
+	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	if tx.RowsAffected == 0 || tx.Error == gorm.ErrRecordNotFound {
-		return nil, errs.UserNotFound
+	if tx.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
 	}
 	return user, nil
 }
@@ -53,7 +52,7 @@ func (r *TelegramUserRepository) GetByUsername(username string) (*models.Telegra
 		return nil, tx.Error
 	}
 	if tx.RowsAffected == 0 {
-		return nil, errs.UserNotFound
+		return nil, gorm.ErrRecordNotFound
 	}
 	return user, nil
 }

@@ -37,21 +37,20 @@ func (r *PhotoRepository) GetByID(id uuid.UUID) (*models.Photo, error) {
 	return photo, nil
 }
 
-
 // GetUsersPhotosByState retrieves photos for a user filtered by state
 func (r *PhotoRepository) GetUsersPhotosByState(
 	id uuid.UUID,
 	state string,
 ) ([]*models.Photo, error) {
 	var photos []*models.Photo
-	
+
 	err := r.DB.
 		Preload("ArticleNumbers").
 		Joins("JOIN telegram_users ON telegram_users.id = photos.user_id").
 		Where("telegram_users.id = ? AND photos.state = ?", id, state).
 		Find(&photos).
 		Error
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +80,22 @@ func (r *PhotoRepository) UpdatePhoto(photo *models.Photo) error {
 	return r.DB.Save(photo).Error
 }
 
-// DeletePhoto deletes a Photo
-func (r *PhotoRepository) DeletePhoto(id uuid.UUID) error {
+func (r *PhotoRepository) DeletePhoto(
+	id uuid.UUID,
+	bucket string) error {
+
+	photo, err := r.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	if bucket != "" {
+		s3ObjectKey := photo.UserID.String() + "/" + photo.S3Key.String() + ".jpg"
+		if err := r.S3Client.DeleteFile(context.Background(), bucket, s3ObjectKey); err != nil {
+			return fmt.Errorf("failed to delete from S3: %w", err)
+		}
+	}
+
 	return r.DB.Delete(&models.Photo{}, id).Error
 }
 
@@ -113,15 +126,20 @@ func (r *PhotoRepository) RemoveArticleNumberFromPhoto(photoID, articleNumberID 
 }
 
 // UploadPhotoToS3 uploads a photo to S3 storage and associates it with article numbers
-func (r *PhotoRepository) UploadPhotoToS3(ctx context.Context, userID uuid.UUID, s3Key uuid.UUID, bucket string, photoData io.Reader) error {
+func (r *PhotoRepository) UploadPhotoToS3(
+	ctx context.Context,
+	userID uuid.UUID,
+	s3Key uuid.UUID,
+	bucket string,
+	photoData io.Reader) error {
 	// Generate S3 object key
 	s3ObjectKey := userID.String() + "/" + s3Key.String() + ".jpg"
-	
+
 	// Upload the file to S3
 	if err := r.S3Client.UploadFile(ctx, bucket, s3ObjectKey, photoData); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -146,4 +164,3 @@ func (r *PhotoRepository) GetPhotoWithArticleNumbers(photoID uuid.UUID) (*models
 	}
 	return photo, nil
 }
-

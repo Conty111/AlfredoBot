@@ -8,10 +8,10 @@ import (
 
 // Container is a DI container for application
 type Container struct {
-	BuildInfo              *build.Info
-	Config                 *configs.Configuration
-	TelegramUserRepository interfaces.TelegramUserManager
-	PhotoRepository        interfaces.PhotoManager
+	BuildInfo               *build.Info
+	Config                  *configs.Configuration
+	TelegramUserRepository  interfaces.TelegramUserManager
+	PhotoRepository         interfaces.PhotoManager
 	ArticleNumberRepository interfaces.ArticleNumberManager
-	S3Client               interfaces.S3Client
+	S3Client                interfaces.S3Client
 }

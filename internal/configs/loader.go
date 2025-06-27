@@ -15,11 +15,16 @@ func LoadConfig(configPath string) (*Configuration, error) {
 
 	setDefaults(v)
 
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load .env file: %w", err)
+	}
 	v.AutomaticEnv()
 
 	// Bind environment variables to config fields
-	bindEnv(v)
+	if err := bindEnv(v); err != nil {
+		return nil, fmt.Errorf("failed to bind environment variables: %w", err)
+	}
 
 	// Load from file if path provided
 	if configPath != "" {
@@ -39,7 +44,7 @@ func LoadConfig(configPath string) (*Configuration, error) {
 
 		// Directly set the config file path
 		v.SetConfigFile(configPath)
-		
+
 		if err := v.ReadInConfig(); err != nil {
 			return nil, fmt.Errorf("failed to read config file at %s: %w", configPath, err)
 		}
@@ -113,34 +118,48 @@ func setDefaults(v *viper.Viper) {
 }
 
 // bindEnv explicitly binds environment variables to config fields
-func bindEnv(v *viper.Viper) {
+func bindEnv(v *viper.Viper) error {
+	var errs []error
+
+	// Helper to collect errors
+	bind := func(key, env string) {
+		if err := v.BindEnv(key, env); err != nil {
+			errs = append(errs, fmt.Errorf("failed to bind %s to %s: %w", env, key, err))
+		}
+	}
+
 	// App config bindings
-	v.BindEnv("app.name", "APP_NAME")
-	v.BindEnv("app.version", "APP_VERSION")
-	v.BindEnv("app.environment", "APP_ENV")
-	v.BindEnv("app.log_file", "APP_LOG_FILE")
-	v.BindEnv("app.enable_json_logs", "APP_JSON_LOGS")
-	v.BindEnv("app.log_level", "APP_LOG_LEVEL")
+	bind("app.name", "APP_NAME")
+	bind("app.version", "APP_VERSION")
+	bind("app.environment", "APP_ENV")
+	bind("app.log_file", "APP_LOG_FILE")
+	bind("app.enable_json_logs", "APP_JSON_LOGS")
+	bind("app.log_level", "APP_LOG_LEVEL")
 
 	// DB config bindings
-	v.BindEnv("db.host", "DB_HOST")
-	v.BindEnv("db.port", "DB_PORT")
-	v.BindEnv("db.user", "DB_USER")
-	v.BindEnv("db.password", "DB_PASSWORD")
-	v.BindEnv("db.name", "DB_NAME")
-	v.BindEnv("db.sslmode", "DB_SSLMODE")
+	bind("db.host", "DB_HOST")
+	bind("db.port", "DB_PORT")
+	bind("db.user", "DB_USER")
+	bind("db.password", "DB_PASSWORD")
+	bind("db.name", "DB_NAME")
+	bind("db.sslmode", "DB_SSLMODE")
 
 	// Telegram config bindings
-	v.BindEnv("telegram.token", "TELEGRAM_TOKEN")
-	v.BindEnv("telegram.timeout", "TELEGRAM_TIMEOUT")
-	v.BindEnv("telegram.webhook_url", "TELEGRAM_WEBHOOK_URL")
-	v.BindEnv("telegram.use_webhook", "TELEGRAM_USE_WEBHOOK")
+	bind("telegram.token", "TELEGRAM_TOKEN")
+	bind("telegram.timeout", "TELEGRAM_TIMEOUT")
+	bind("telegram.webhook_url", "TELEGRAM_WEBHOOK_URL")
+	bind("telegram.use_webhook", "TELEGRAM_USE_WEBHOOK")
 
 	// S3 config bindings
-	v.BindEnv("s3.endpoint", "S3_ENDPOINT")
-	v.BindEnv("s3.region", "S3_REGION")
-	v.BindEnv("s3.access_key_id", "S3_ACCESS_KEY_ID")
-	v.BindEnv("s3.secret_access_key", "S3_SECRET_ACCESS_KEY")
-	v.BindEnv("s3.bucket", "S3_BUCKET")
-	v.BindEnv("s3.use_ssl", "S3_USE_SSL")
+	bind("s3.endpoint", "S3_ENDPOINT")
+	bind("s3.region", "S3_REGION")
+	bind("s3.access_key_id", "S3_ACCESS_KEY_ID")
+	bind("s3.secret_access_key", "S3_SECRET_ACCESS_KEY")
+	bind("s3.bucket", "S3_BUCKET")
+	bind("s3.use_ssl", "S3_USE_SSL")
+
+	if len(errs) > 0 {
+		return fmt.Errorf("environment binding errors: %v", errs)
+	}
+	return nil
 }

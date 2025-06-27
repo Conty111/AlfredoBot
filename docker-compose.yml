@@ -1,5 +1,5 @@
 services:
-  postgres-db:
+  postgres:
     image: postgres
     restart: unless-stopped
     env_file:
@@ -28,7 +28,7 @@ services:
       - MINIO_SCHEME=https
       - MINIO_CONSOLE_PORT_NUMBER=9001
     volumes:
-      - ./minio:/data
+      - minio-data:/data
       - ./certs:/certs
     healthcheck:
       test: [ "CMD", "curl", "-k", "https://localhost:9000/minio/health/live" ]
@@ -47,7 +47,7 @@ services:
     depends_on:
       minio:
         condition: service_healthy
-  alfredo-bot:
+  telegram-bot:
     build:
       context: .
     image: alfredo-bot:latest
@@ -55,9 +55,10 @@ services:
     env_file:
       - .env
     volumes:
-      - ./certs:/app/certs:ro
+      - ./certs:/certs:ro
+      - ./config.docker.yaml:/config.yaml:ro
     depends_on:
-      postgres-db:
+      postgres:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
@@ -68,7 +69,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    command: ["./app", "serve"]
+    command: ["./app", "serve", "--config", "config.yaml"]
 
 volumes:
   alfredo-db-data:

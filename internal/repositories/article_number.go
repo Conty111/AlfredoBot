@@ -68,13 +68,13 @@ func (r *ArticleNumberRepository) DeleteArticleNumber(id uuid.UUID) error {
 // GetOrCreateArticleNumber gets an existing article number by number string or creates a new one
 func (r *ArticleNumberRepository) GetOrCreateArticleNumber(number string) (*models.ArticleNumber, error) {
 	articleNumber := &models.ArticleNumber{}
-	
+
 	// Try to find existing article number
 	tx := r.db.Where("number = ?", number).First(articleNumber)
 	if tx.Error == nil {
 		return articleNumber, nil
 	}
-	
+
 	// If not found, create a new one
 	if tx.Error == gorm.ErrRecordNotFound {
 		articleNumber = &models.ArticleNumber{
@@ -85,7 +85,7 @@ func (r *ArticleNumberRepository) GetOrCreateArticleNumber(number string) (*mode
 		}
 		return articleNumber, nil
 	}
-	
+
 	// Return any other error
 	return nil, tx.Error
 }

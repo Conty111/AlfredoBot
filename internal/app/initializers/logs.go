@@ -26,9 +26,9 @@ func InitializeLogs(cfg configs.App) error {
 	// Configure logger with UTC timestamps and caller info
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.Level(logLevel))
-	
+
 	if cfg.Environment == "production" ||
-	   cfg.JSONLogs || cfg.LogFile != "" {
+		cfg.JSONLogs || cfg.LogFile != "" {
 		output := os.Stdout
 		if cfg.LogFile != "" {
 			file, err := os.OpenFile(cfg.LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -44,10 +44,10 @@ func InitializeLogs(cfg configs.App) error {
 			Logger()
 	} else {
 		zlog.Logger = zlog.
-		Output(zerolog.ConsoleWriter{Out: os.Stdout}).
-		With().
-		Caller().
-		Logger()
+			Output(zerolog.ConsoleWriter{Out: os.Stdout}).
+			With().
+			Caller().
+			Logger()
 	}
 
 	zerolog.DefaultContextLogger = &zlog.Logger

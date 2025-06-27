@@ -78,7 +78,7 @@ func (c *S3ClientImpl) UploadFile(ctx context.Context, bucket, key string, file 
 
 	// Create a new reader from the bytes
 	fileReader := bytes.NewReader(fileBytes)
-	
+
 	// Upload with content length
 	_, err = c.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:        aws.String(bucket),
@@ -113,7 +113,7 @@ func (c *S3ClientImpl) DeleteFile(ctx context.Context, bucket, key string) error
 // GeneratePresignedURL generates a presigned URL for an S3 object
 func (c *S3ClientImpl) GeneratePresignedURL(ctx context.Context, bucket, key string, expiresIn int64) (string, error) {
 	presignClient := s3.NewPresignClient(c.client)
-	
+
 	req, err := presignClient.PresignGetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),

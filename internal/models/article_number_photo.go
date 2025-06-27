@@ -6,7 +6,7 @@ import "github.com/google/uuid"
 type ArticleNumberPhoto struct {
 	ArticleNumberID uuid.UUID `gorm:"primaryKey"`
 	PhotoID         uuid.UUID `gorm:"primaryKey"`
-	
+
 	ArticleNumber ArticleNumber `gorm:"foreignKey:ArticleNumberID"`
 	Photo         Photo         `gorm:"foreignKey:PhotoID"`
 }

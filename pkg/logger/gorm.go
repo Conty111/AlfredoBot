@@ -2,8 +2,9 @@ package logger
 
 import (
 	"context"
-	"github.com/rs/zerolog/log"
 	"time"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/rs/zerolog"
 	"gorm.io/gorm/logger"

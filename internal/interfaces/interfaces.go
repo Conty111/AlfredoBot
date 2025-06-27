@@ -40,7 +40,7 @@ type PhotoManager interface {
 	CreatePhoto(photo *models.Photo) error
 	GetUsersPhotosByState(userID uuid.UUID, state string) ([]*models.Photo, error)
 	UpdatePhoto(photo *models.Photo) error
-	DeletePhoto(id uuid.UUID) error
+	DeletePhoto(id uuid.UUID, bucket string) error
 	AddArticleNumberToPhoto(photoID, articleNumberID uuid.UUID) error
 	RemoveArticleNumberFromPhoto(photoID, articleNumberID uuid.UUID) error
 	UploadPhotoToS3(ctx context.Context, userID uuid.UUID, s3Key uuid.UUID, bucket string, photoData io.Reader) error

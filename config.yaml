@@ -1,0 +1,26 @@
+app:
+  name: "AlfredoBot"
+  version: "0.0.1"
+  environment: "development"
+  log_level: 0
+  # log_file: "logs/alfredo.log"
+  enable_json_logs: false
+
+db:
+  host: "localhost"
+  port: 5432
+  name: "postgres"
+  sslmode: "disable"
+
+telegram:
+  timeout: 60
+  use_webhook: false
+  debug: false
+
+s3:
+  endpoint: "https://127.0.0.1:9000"
+  region: "us-east-1"
+  bucket: "alfredo-bucket"
+  # access_key_id_file: ""
+  # secret_access_key_file: ""
+  use_ssl: true

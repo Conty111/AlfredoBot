@@ -22,7 +22,7 @@ func InitializeDatabase(cfg *configs.Configuration) *gorm.DB {
 }
 
 func InitializeMigrations(db *gorm.DB) error {
-	
+
 	err := db.AutoMigrate(
 		&models.TelegramUser{},
 		&models.Photo{},
@@ -35,4 +35,3 @@ func InitializeMigrations(db *gorm.DB) error {
 	}
 	return nil
 }
-

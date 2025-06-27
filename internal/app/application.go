@@ -69,15 +69,14 @@ func InitializeApplication(cfg *configs.Configuration) (*Application, error) {
 	} else {
 		photoRepository = app.Container.PhotoRepository
 	}
-	
+
 	var articleRepository interfaces.ArticleNumberManager
 	if app.Container.ArticleNumberRepository == nil {
 		articleRepository = repositories.NewArticleNumberRepository(app.db)
 	} else {
 		articleRepository = app.Container.ArticleNumberRepository
 	}
-	
-	
+
 	// Initialize Telegram bot service
 	telegramBot, err := telegram.NewTelegramBotService(
 		cfg.Telegram,
@@ -131,12 +130,12 @@ func createS3Client(cfg *configs.S3Config) (interfaces.S3Client, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("S3 config is nil")
 	}
-	
+
 	// Import the s3 package
 	s3Client, err := s3.NewClient(cfg)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return s3.NewS3Client(s3Client), nil
 }

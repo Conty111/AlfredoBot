@@ -20,10 +20,15 @@ run:
 test-unit:
 	go test -v -cover ./...
 
-test-all:
-	#$(MAKE) start-docker-compose-test
-	go test -v ./...
-	#${MAKE} stop-docker-compose-test
+lint:
+	golangci-lint run ./...
+
+format:
+	goimports -w -l .
+	gofmt -w -s .
+
+check-format:
+	test -z $$(goimports -l .) && test -z $$(gofmt -l .)
 
 .PHONY: build
 build:
@@ -35,16 +40,14 @@ gen:
 deps:
 	wire ./...
 
-swagger:
-	swag init --parseDependency -g cmd/app/main.go --output=./docs/api/web
-
 install-tools:
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.57.2
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.1.6
 	go install github.com/google/wire/cmd/wire@latest
-	go install github.com/swaggo/swag/cmd/swag@latest
+	go install golang.org/x/tools/cmd/goimports@latest
 	go get -u github.com/onsi/ginkgo/ginkgo
 
 gen-certs:
 	mkdir -p certs
 	chmod +x scripts/generate-minio-certs.sh
 	./scripts/generate-minio-certs.sh
+	

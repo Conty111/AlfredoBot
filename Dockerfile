@@ -1,16 +1,16 @@
 # image for compiling binary
-ARG BUILDER_IMAGE="golang:1.22"
+ARG BUILDER_IMAGE="golang:1.23.10"
 # here we'll run binary app
 ARG RUNNER_IMAGE="alpine:latest"
 
 
 # build stage
-FROM ${BUILDER_IMAGE} as builder
+FROM ${BUILDER_IMAGE} AS builder
 
-ENV GO111MODULE on
+ENV GO111MODULE=on
 #ENV GOPRIVATE ${GOPRIVATE}
 
-RUN mkdir src
+# RUN mkdir src
 WORKDIR /src
 COPY go.mod go.sum ./
 # Get dependencies. Also will be cached if we won't change mod/sum
@@ -29,11 +29,9 @@ FROM ${RUNNER_IMAGE}
 RUN apk update && apk upgrade && apk add --no-cache ca-certificates
 RUN apk add musl-dev && apk add libc6-compat
 
-RUN #mkdir -p ./api
 RUN mkdir -p ./db/migrations
 RUN mkdir -p ./certs
 
-#COPY --from=builder /source/docs/api ./docs/api
-COPY --from=builder /source/build/app .
+COPY --from=builder /src/build/app .
 
 RUN chmod +x app

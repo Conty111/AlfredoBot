@@ -1,0 +1,26 @@
+app:
+  name: "AlfredoBot"
+  version: "0.0.1"
+  environment: "production"
+  log_level: 0
+  # log_file: "logs/alfredo.log"
+  enable_json_logs: true
+
+db:
+  host: "postgres"
+  port: 5432
+  name: "postgres"
+  sslmode: "disable"
+
+telegram:
+  timeout: 60
+  use_webhook: false
+  debug: true
+
+s3:
+  endpoint: "https://minio:9000"
+  region: "us-east-1"
+  bucket: "alfredo-bucket"
+  # access_key_id_file: ""
+  # secret_access_key_file: ""
+  use_ssl: true

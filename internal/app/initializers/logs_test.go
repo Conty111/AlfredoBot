@@ -17,4 +17,3 @@ var _ = Describe("Logs", func() {
 		})
 	})
 })
-
