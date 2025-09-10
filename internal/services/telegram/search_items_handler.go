@@ -32,13 +32,6 @@ func (s *TelegramBotService) searchByArticleNumberHandler(ctx context.Context, b
 }
 
 func (s *TelegramBotService) handleArticleNumberSearch(ctx context.Context, b *bot.Bot, update *tgmodels.Update) {
-
-	user, err := s.userRepository.GetByTelegramID(update.Message.From.ID)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to get user")
-		return
-	}
-
 	if update.Message.Text == "" {
 		_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:      update.Message.Chat.ID,
@@ -141,7 +134,7 @@ func (s *TelegramBotService) handleArticleNumberSearch(ctx context.Context, b *b
 	}
 
 	for s3Key, articlesStr := range totalPhotos {
-		fileReader, err := s.photoRepository.GetPhotoFromS3(ctx, user.ID, s3Key, s.s3Config.Bucket)
+		fileReader, err := s.photoRepository.GetPhotoFromS3(ctx, s3Key, s.s3Config.Bucket)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -179,7 +172,7 @@ func (s *TelegramBotService) handleArticleNumberSearch(ctx context.Context, b *b
 		log.Error().Err(err).Msg("Failed to reset user state")
 	}
 
-	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:      update.Message.Chat.ID,
 		Text:        "Поиск завершен!",
 		ReplyMarkup: mainMenu,

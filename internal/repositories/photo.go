@@ -90,7 +90,7 @@ func (r *PhotoRepository) DeletePhoto(
 	}
 
 	if bucket != "" {
-		s3ObjectKey := photo.UserID.String() + "/" + photo.S3Key.String() + ".jpg"
+		s3ObjectKey := photo.S3Key.String() + ".jpg"
 		if err := r.S3Client.DeleteFile(context.Background(), bucket, s3ObjectKey); err != nil {
 			return fmt.Errorf("failed to delete from S3: %w", err)
 		}
@@ -128,12 +128,11 @@ func (r *PhotoRepository) RemoveArticleNumberFromPhoto(photoID, articleNumberID 
 // UploadPhotoToS3 uploads a photo to S3 storage and associates it with article numbers
 func (r *PhotoRepository) UploadPhotoToS3(
 	ctx context.Context,
-	userID uuid.UUID,
 	s3Key uuid.UUID,
 	bucket string,
 	photoData io.Reader) error {
-	// Generate S3 object key
-	s3ObjectKey := userID.String() + "/" + s3Key.String() + ".jpg"
+	// Generate S3 object key - no longer using userID in the path for global visibility
+	s3ObjectKey := s3Key.String() + ".jpg"
 
 	// Upload the file to S3
 	if err := r.S3Client.UploadFile(ctx, bucket, s3ObjectKey, photoData); err != nil {
@@ -144,14 +143,14 @@ func (r *PhotoRepository) UploadPhotoToS3(
 }
 
 // GetPhotoFromS3 downloads a photo from S3 storage
-func (r *PhotoRepository) GetPhotoFromS3(ctx context.Context, userID uuid.UUID, s3Key uuid.UUID, bucket string) (io.ReadCloser, error) {
-	s3ObjectKey := userID.String() + "/" + s3Key.String() + ".jpg"
+func (r *PhotoRepository) GetPhotoFromS3(ctx context.Context, s3Key uuid.UUID, bucket string) (io.ReadCloser, error) {
+	s3ObjectKey := s3Key.String() + ".jpg"
 	return r.S3Client.DownloadFile(ctx, bucket, s3ObjectKey)
 }
 
 // GetPhotoURL generates a URL for a photo in S3
-func (r *PhotoRepository) GetPhotoURL(ctx context.Context, userID uuid.UUID, s3Key uuid.UUID, bucket string, endpoint string) string {
-	s3ObjectKey := userID.String() + "/" + s3Key.String() + ".jpg"
+func (r *PhotoRepository) GetPhotoURL(ctx context.Context, s3Key uuid.UUID, bucket string, endpoint string) string {
+	s3ObjectKey := s3Key.String() + ".jpg"
 	return endpoint + "/" + bucket + "/" + s3ObjectKey
 }
 

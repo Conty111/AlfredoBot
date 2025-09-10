@@ -69,7 +69,6 @@ func (s *TelegramBotService) photoMessageHandler(ctx context.Context, b *bot.Bot
 			return
 		}
 	} else if update.Message.Document != nil && update.Message.Document.FileID != "" {
-		// Handle document attachments (like image files)
 		file, err = b.GetFile(ctx, &bot.GetFileParams{
 			FileID: update.Message.Document.FileID,
 		})
@@ -148,7 +147,6 @@ func (s *TelegramBotService) photoMessageHandler(ctx context.Context, b *bot.Bot
 
 		if err := s.photoRepository.UploadPhotoToS3(
 			ctx,
-			user.ID,
 			s3Key,
 			s.s3Config.Bucket,
 			resp.Body,

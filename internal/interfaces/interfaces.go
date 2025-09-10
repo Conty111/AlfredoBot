@@ -43,9 +43,9 @@ type PhotoManager interface {
 	DeletePhoto(id uuid.UUID, bucket string) error
 	AddArticleNumberToPhoto(photoID, articleNumberID uuid.UUID) error
 	RemoveArticleNumberFromPhoto(photoID, articleNumberID uuid.UUID) error
-	UploadPhotoToS3(ctx context.Context, userID uuid.UUID, s3Key uuid.UUID, bucket string, photoData io.Reader) error
-	GetPhotoFromS3(ctx context.Context, userID uuid.UUID, s3Key uuid.UUID, bucket string) (io.ReadCloser, error)
-	GetPhotoURL(ctx context.Context, userID uuid.UUID, s3Key uuid.UUID, bucket string, endpoint string) string
+	UploadPhotoToS3(ctx context.Context, s3Key uuid.UUID, bucket string, photoData io.Reader) error
+	GetPhotoFromS3(ctx context.Context, s3Key uuid.UUID, bucket string) (io.ReadCloser, error)
+	GetPhotoURL(ctx context.Context, s3Key uuid.UUID, bucket string, endpoint string) string
 }
 
 type ArticleNumberProvider interface {
