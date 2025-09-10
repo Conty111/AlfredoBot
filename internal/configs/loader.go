@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"log"
 
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
@@ -17,7 +18,7 @@ func LoadConfig(configPath string) (*Configuration, error) {
 
 	err := godotenv.Load()
 	if err != nil {
-		return nil, fmt.Errorf("failed to load .env file: %w", err)
+		log.Printf("Warning: failed to load .env file: %v", err)
 	}
 	v.AutomaticEnv()
 
